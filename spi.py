@@ -9,7 +9,7 @@ def init():
     spi.open(0,0)
     return spi
 
-def frame_write(spi, data):
+def frame_write(spi):
     """
     Set /SEL = L to start writing to the frame buffer
     Format is | 011 reserved[4:0] |    PHR[7:0]     |   PSDU[7:0]    | ...
@@ -18,10 +18,10 @@ def frame_write(spi, data):
     # SRAM write starting from address 0x00
     cmd_byte = 0x40
     address = 0x00
-    length = 0x00
-
-    print spi.xfer2([cmd_byte, address, length])
+    length = 0x05
    
+    print spi.xfer2([cmd_byte, address, length, 0x02, 0x00, 0x27, 0x05, 0xE0])
+
 def read_register(spi, address):
     """
     The register address is contained within address[5:0].
@@ -41,23 +41,27 @@ def write_register(spi, address, byte):
 def main(argv):
     spi = init()
 
-    frame_write(spi, []) # Frame data
-    print read_register(spi, 0x01)
+    while True: 
+        
+        frame_write(spi)
+        print read_register(spi, 0x01)
 
-    write_register(spi, 0x02, 0x03) # FORCE_TRX_OFF
-    print read_register(spi, 0x01)
+        write_register(spi, 0x02, 0x03) # FORCE_TRX_OFF
+        print read_register(spi, 0x01)
    
-    write_register(spi, 0x02, 0x09) # PLL_ON (TX_ON)
-    sleep(0.01)
-    print read_register(spi, 0x01)
+        write_register(spi, 0x02, 0x09) # PLL_ON (TX_ON)
+        print read_register(spi, 0x01)
 
-    write_register(spi, 0x02, 0x02) # TX_START
-    print read_register(spi, 0x01)   
+        write_register(spi, 0x02, 0x02) # TX_START
+        print read_register(spi, 0x01)   
+        
+        sleep(0.01)        
+        print 'Finished sending'
+        print 'Status after send:', read_register(spi, 0x01) 
 
-    sleep(1) 
-    print read_register(spi, 0x01)
- 
-    
+        print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be enabled)'
+        print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be cleared)'
+
 if __name__ == "__main__":
     main(sys.argv)
 
