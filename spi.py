@@ -41,26 +41,33 @@ def write_register(spi, address, byte):
 def main(argv):
     spi = init()
 
+    # Enable automatic FCS generation
+    #write_register(spi, 0x04, 0x20)
+
     while True: 
         
         frame_write(spi)
-        print read_register(spi, 0x01)
+        print 'Status:', read_register(spi, 0x01)
 
         write_register(spi, 0x02, 0x03) # FORCE_TRX_OFF
-        print read_register(spi, 0x01)
-   
+        print 'Status:', read_register(spi, 0x01)
+        sleep(0.01)   
+
         write_register(spi, 0x02, 0x09) # PLL_ON (TX_ON)
-        print read_register(spi, 0x01)
+        print 'Status:', read_register(spi, 0x01)
+        sleep(0.01)
 
         write_register(spi, 0x02, 0x02) # TX_START
-        print read_register(spi, 0x01)   
-        
+        print 'Status:', read_register(spi, 0x01)           
         sleep(0.01)        
+
         print 'Finished sending'
         print 'Status after send:', read_register(spi, 0x01) 
 
         print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be enabled)'
         print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be cleared)'
+
+        print '#####################################################'
 
 if __name__ == "__main__":
     main(sys.argv)
