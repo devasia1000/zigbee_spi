@@ -51,15 +51,12 @@ def main(argv):
 
         write_register(spi, 0x02, 0x03) # FORCE_TRX_OFF
         print 'Status:', read_register(spi, 0x01)
-        sleep(0.01)   
 
         write_register(spi, 0x02, 0x09) # PLL_ON (TX_ON)
         print 'Status:', read_register(spi, 0x01)
-        sleep(0.01)
 
         write_register(spi, 0x02, 0x02) # TX_START
         print 'Status:', read_register(spi, 0x01)           
-        sleep(0.01)        
 
         print 'Finished sending'
         print 'Status after send:', read_register(spi, 0x01) 
