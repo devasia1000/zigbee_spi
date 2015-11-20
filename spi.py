@@ -41,6 +41,10 @@ def write_register(spi, address, byte):
 def main(argv):
     spi = init()
 
+    
+    # Choose channel
+    write_register(spi, 0x08, 0x14)
+
     # Enable automatic FCS generation
     write_register(spi, 0x04, 0x20)
     
