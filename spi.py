@@ -42,7 +42,10 @@ def main(argv):
     spi = init()
 
     # Enable automatic FCS generation
-    #write_register(spi, 0x04, 0x20)
+    write_register(spi, 0x04, 0x20)
+    
+    # Enable all interrupts
+    write_register(spi, 0x0e, 0xff)
 
     while True: 
         
