@@ -16,11 +16,10 @@ def frame_write(spi):
     Set /SEL = H to stop writing to the frame buffer
     """
     # SRAM write starting from address 0x00
-    cmd_byte = 0x40
-    address = 0x00
-    length = 0x05
+    cmd_byte = 0x60
+    length = 0x03
    
-    print spi.xfer2([cmd_byte, address, length, 0x02, 0x00, 0x27, 0x05, 0xE0])
+    print spi.xfer2([cmd_byte, length, 0xFF, 0xFF, 0xFF])
 
 def read_register(spi, address):
     """
@@ -40,7 +39,6 @@ def write_register(spi, address, byte):
 
 def main(argv):
     spi = init()
-
     
     # Choose channel
     write_register(spi, 0x08, 0x14)
@@ -51,27 +49,28 @@ def main(argv):
     # Enable all interrupts
     write_register(spi, 0x0e, 0xff)
 
-    while True: 
+#    while True: 
         
-        frame_write(spi)
-        print 'Status:', read_register(spi, 0x01)
+    frame_write(spi)
+    print 'Status:', read_register(spi, 0x01)
 
-        write_register(spi, 0x02, 0x03) # FORCE_TRX_OFF
-        print 'Status:', read_register(spi, 0x01)
+    write_register(spi, 0x02, 0x03) # FORCE_TRX_OFF
+    print 'Status:', read_register(spi, 0x01)
 
-        write_register(spi, 0x02, 0x09) # PLL_ON (TX_ON)
-        print 'Status:', read_register(spi, 0x01)
+    write_register(spi, 0x02, 0x09) # PLL_ON (TX_ON)
+    print 'Status:', read_register(spi, 0x01)
 
-        write_register(spi, 0x02, 0x02) # TX_START
-        print 'Status:', read_register(spi, 0x01)           
+    write_register(spi, 0x02, 0x02) # TX_START
+    print 'Status:', read_register(spi, 0x01)           
+        
+    sleep(0.01)
+    print 'Finished sending'
+    print 'Status after send:', read_register(spi, 0x01) 
 
-        print 'Finished sending'
-        print 'Status after send:', read_register(spi, 0x01) 
+    print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be enabled)'
+    print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be cleared)'
 
-        print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be enabled)'
-        print 'IRQ status register:', read_register(spi, 0x0F), '(TRX_END should be cleared)'
-
-        print '#####################################################'
+    print '#####################################################'
 
 if __name__ == "__main__":
     main(sys.argv)
