@@ -7,6 +7,7 @@ Reads Zigbee frames and turns LEDs on/off
 import sys
 import signal
 import argparse
+import RPi.GPIO as GPIO
 
 from killerbee import *
 
@@ -38,10 +39,26 @@ kb.sniffer_on()
 
 print("zbdump: listening on \'{0}\', link-type DLT_IEEE802_15_4, capture size 127 bytes".format(kb.get_dev_info()[0]))
 
+led_on = '\xff\xff'
+led_off = '\x01\x01'
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(40, GPIO.OUT)
+
 rf_freq_mhz = (args.channel - 10) * 5 + 2400
 while args.count != packetcount:
     packet = kb.pnext()
-    print packet
+    if packet is not None:
+        print packet
+        data = str(packet['bytes'])
+        if data == led_on:
+            print 'LED turned on'
+            GPIO.output(40, True)
+        if data == led_off:
+            print 'LED turned off'
+            GPIO.output(40, False)
+#    else:
+#        print packet
 
 kb.sniffer_off()
 kb.close()
