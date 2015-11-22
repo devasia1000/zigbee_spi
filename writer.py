@@ -3,6 +3,8 @@ import spidev
 import time
 import sys
 from time import sleep
+import socket
+import json
 
 def init():
     spi = spidev.SpiDev()
@@ -99,13 +101,25 @@ def set_led_off(spi):
 def main(argv):
     spi = init()
     init_chip(spi)    
-   
-    while True: 
-        set_led_on(spi)
-        sleep(0.5)
-        set_led_off(spi)    
-        sleep(0.5)
+  
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('52.25.165.62', 80))
 
+    while True:
+
+        message = client_socket.recv(4096)
+        data = json.loads(message)
+
+        led = data['display_name']
+        value = data['value']
+
+        print led, 'is', value
+        if led == 'LED #1':
+            if value == 'on':
+                set_led_on(spi)
+            if value == 'off':
+                set_led_off(spi)
+ 
 if __name__ == "__main__":
     main(sys.argv)
 
