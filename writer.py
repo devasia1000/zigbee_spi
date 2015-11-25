@@ -9,6 +9,19 @@ import json
 def init():
     spi = spidev.SpiDev()
     spi.open(0,0)
+
+    # Choose channel
+    write_register(spi, 0x08, 0x14)
+
+    # Enable automatic FCS generation
+    #write_register(spi, 0x04, 0x20)
+
+    # Disable automatic FCS generation
+    write_register(spi, 0x04, 0x00)
+
+    # Enable all interrupts
+    write_register(spi, 0x0e, 0xff)
+
     return spi
 
 def frame_write(spi, data):
@@ -38,19 +51,6 @@ def read_register(spi, address):
 def write_register(spi, address, byte):
     cmd_byte = 0xC0 | address    
     [status, empty] = spi.xfer2([cmd_byte, byte])
-
-def init_chip(spi):
-    # Choose channel
-    write_register(spi, 0x08, 0x14)
-
-    # Enable automatic FCS generation
-    #write_register(spi, 0x04, 0x20)
-
-    # Disable automatic FCS generation
-    write_register(spi, 0x04, 0x00)
-
-    # Enable all interrupts
-    write_register(spi, 0x0e, 0xff)
 
 def set_led_on(spi):
     print 'Going to turn LED on: '    
@@ -100,10 +100,10 @@ def set_led_off(spi):
 
 def main(argv):
     spi = init()
-    init_chip(spi)    
   
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('52.25.165.62', 80))
+    print 'Connected to Samsung SmartThings endpoint'
 
     while True:
 
