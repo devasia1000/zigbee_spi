@@ -136,5 +136,5 @@ def setWinkLightbulbState(value):
     else:
         status_string = 'false'
 
-    os.system('curl -X PUT -d "{\\"desired_state\\":{\\"powered\\":' + status_string + ',\\"brightness\\":1}}" -H "Authorization: Bearer ' + access_token + '" -H "Content-Type: application/json" "https://winkapi.quirky.com/light_bulbs/1086427"')
+    os.system('curl -X PUT -d "{\\"desired_state\\":{\\"powered\\":' + status_string + ',\\"brightness\\":1}}" -H "Authorization: Bearer ' + access_token + '" -H "Content-Type: application/json" "https://winkapi.quirky.com/light_bulbs/1139935"')
    
